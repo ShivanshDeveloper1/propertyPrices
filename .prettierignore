@@ -1,0 +1,13 @@
+node_modules
+.next
+dist
+build
+public
+
+{
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "printWidth": 80
+}

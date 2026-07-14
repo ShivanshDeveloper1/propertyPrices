@@ -1,0 +1,16 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import Navbar from "./Navbar";
+import Header from "./Navbar";
+
+export default function NavbarWrapper() {
+  const pathname = usePathname();
+
+  const hideNavbar =
+    pathname.startsWith("/admin")|| pathname.startsWith('/oldbooks')
+
+  if (hideNavbar) return null;
+
+  return <Header />;
+}

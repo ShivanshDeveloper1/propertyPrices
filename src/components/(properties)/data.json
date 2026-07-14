@@ -1,0 +1,58 @@
+[
+  {
+    "slug": "2bhk-house-for-sale-in-ganpati-vihar-saharanpur-1",
+    "type": "for sale",
+    "location": "Ganpati Vihar",
+    "bathroom": 1,
+    "bedrooms": 2,
+    "image": "icon.png",
+    "images": ["chess.avif", "hall.avif", "kitchen.avif"],
+    "city": "Saharanpur",
+    "alt": "This is property image",
+    "area": 891.359,
+    "price": 5500000,
+    "Builtyear": 2020
+  },
+  {
+    "slug": "2bhk-house-for-sale-in-ganpati-vihar-saharanpur-2",
+    "type": "for sale",
+    "location": "Ganpati Vihar",
+    "bathroom": 1,
+    "bedrooms": 2,
+    "image": "icon.png",
+    "images": ["chess.avif", "hall.avif", "kitchen.avif"],
+    "city": "Saharanpur",
+    "alt": "This is property image",
+    "area": 891.359,
+    "price": 5500000,
+    "Builtyear": 2020
+  },
+  {
+    "slug": "2bhk-house-for-sale-in-ganpati-vihar-saharanpur-3",
+    "type": "for sale",
+    "location": "Ganpati Vihar",
+    "bathroom": 1,
+    "bedrooms": 2,
+    "image": "blog/chemistryexame.jpeg",
+    "images": ["chess.avif", "hall.avif", "kitchen.avif"],
+    "city": "Saharanpur",
+    "alt": "This is property image",
+    "area": 891.359,
+    "price": 5500000,
+    "Builtyear": 2020
+  },
+  {
+    "slug": "2bhk-house-for-sale-in-ganpati-vihar-saharanpur-4",
+    "type": "for sale",
+    "location": "Ganpati Vihar",
+    "bathroom": 1,
+    "bedrooms": 2,
+    "image": "chess.avif",
+    "images": ["chess.avif", "hall.avif", "kitchen.avif"],
+    "city": "Saharanpur",
+    "alt": "This is property image",
+    "area": 891.359,
+    "price": 5500000,
+    "Builtyear": 2020
+  }
+]
