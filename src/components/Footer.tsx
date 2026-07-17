@@ -15,7 +15,7 @@ export default function Footer() {
       >
         {/* --- Main Copyright & Disclaimer --- */}
         <p className="text-gray-600 text-sm font-medium">
-          © {new Date().getFullYear()} Saharanpur Properties. Property rates
+          © {new Date().getFullYear()} SaharanpurPrice.in. Property rates
           updated regularly.
         </p>
 
@@ -25,12 +25,36 @@ export default function Footer() {
         </p>
 
         {/* --- SEO LINK (Only About Us) --- */}
-        <div className="flex items-center justify-center mt-5">
+        <div className="flex items-center justify-center gap-4 mt-5">
           <Link
             href="/about"
             className="text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors uppercase tracking-widest border-b border-transparent hover:border-green-600 pb-0.5"
           >
             About Us
+          </Link>
+          <Link
+            href="/contact"
+            className="text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors uppercase tracking-widest border-b border-transparent hover:border-green-600 pb-0.5"
+          >
+            Contact Us
+          </Link>
+             <Link
+            href="/privacy-policy"
+            className="text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors uppercase tracking-widest border-b border-transparent hover:border-green-600 pb-0.5"
+          >
+            Privacy Policy
+          </Link>
+             <Link
+            href="/disclaimer"
+            className="text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors uppercase tracking-widest border-b border-transparent hover:border-green-600 pb-0.5"
+          >
+           Disclaimer
+          </Link>
+           <Link
+            href="/terms-condition"
+            className="text-xs font-semibold text-gray-500 hover:text-green-600 transition-colors uppercase tracking-widest border-b border-transparent hover:border-green-600 pb-0.5"
+          >
+           Terms & Conditions
           </Link>
         </div>
 
@@ -57,7 +81,7 @@ export default function Footer() {
           <span className="text-gray-400 hidden sm:inline">|</span>
 
           <a
-            href="http://webcontractor.in"
+            href="https://webcontractor.in"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-green-600 transition-colors"
