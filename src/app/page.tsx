@@ -2,7 +2,7 @@ import Accordian from "@/components/home/Accordian";
 import SearchableLocalities from "@/components/home/SearchableLocalities";
 import Link from "next/link";
 import React from "react";
-import { questions } from '@/data/Accordian'
+import { questions } from "@/data/Accordian";
 
 export interface Locality {
   _id: string;
@@ -30,7 +30,9 @@ export async function generateMetadata({
     description: `Latest government circle rates and market property prices in ${cityName}. Check land registry rates updated for ${new Date().getFullYear()}.`,
     alternates: {
       // ✅ Normalized canonical to prevent duplicate content
-      canonical: `${process.env.NEXT_PUBLIC_APP_URL}${params.city ? `?city=${params.city.toLowerCase()}` : ""}`,
+      canonical: `${process.env.NEXT_PUBLIC_APP_URL}${
+        params.city ? `?city=${params.city.toLowerCase()}` : ""
+      }`,
     },
   };
 }
@@ -92,6 +94,22 @@ export default async function Home({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
+      {/* ⚡ SALE ANNOUNCEMENT BANNER */}
+      <div className="bg-red-50 border-2 border-red-500 text-red-800 p-6 rounded-2xl mb-10 text-center shadow-lg">
+        <p className="text-2xl md:text-3xl font-extrabold tracking-tight mb-1">
+          Hello everyone I want to sale this site.
+        </p>
+        <p className="text-xl md:text-2xl font-bold">
+          Contact me now at this number:{" "}
+          <a
+            href="tel:+917618550475"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            +91 7618550475
+          </a>
+        </p>
+      </div>
+
       <div className="text-center mb-12">
         {/* ✅ SEO Tip: H1 must include the City Name */}
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
@@ -112,33 +130,6 @@ export default async function Home({
           initialCity={currentCity}
         />
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-6 mt-12 mb-12">
@@ -178,16 +169,8 @@ export default async function Home({
         )}
       </div>
 
-
-      
       {/* Accordian */}
-
       <Accordian questions={questions} />
-
-
-
-
-
 
       {/* Footer / Browse All */}
       <footer className="mt-20 pt-10 border-t border-gray-200">
@@ -205,16 +188,16 @@ export default async function Home({
             </Link>
           ))}
 
-           <div className="max-w-7xl mx-auto px-4 flex justify-between">
-  
-    <a href="/download-circle-rate" className="hover:text-slate-600 transition-colors underline decoration-slate-200 mt-2">
-      UP District-wise Property Rate List Directory (PDF)
-    </a>
-  </div>
+          <div className="max-w-7xl mx-auto px-4 flex justify-between">
+            <a
+              href="/download-circle-rate"
+              className="hover:text-slate-600 transition-colors underline decoration-slate-200 mt-2"
+            >
+              UP District-wise Property Rate List Directory (PDF)
+            </a>
+          </div>
         </div>
       </footer>
-
-    
     </div>
   );
 }
