@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { blogGraph } from "@/lib/bloggraph/graph";
-import connectDB from "@/lib/db";
-import Blog from "@/model/Blog";
+import { connectDB } from "@/lib/mongodb"
+import Blog from "@/models/Blog";
 
 // Automatic Generation ke liye target niches
 const TARGET_NICHES = [
