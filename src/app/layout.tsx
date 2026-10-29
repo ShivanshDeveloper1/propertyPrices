@@ -27,9 +27,9 @@ const GA_MEASUREMENT_ID = "G-DG77CVN1ZL";
 
 // --- SEO & Metadata ---
 export const metadata = {
-  title: "Property Rates in Saharanpur  | Official Circle Rates 2025",
+  title: "Saharanpur Property Rates | Government Circle Rate List by Locality (सर्किल रेट)",
   description:
-    "Check the latest official government circle rates and market prices for Saharanpur localities and Noida YEIDA sectors. Verified land prices for residential and commercial properties updated for 2025.",
+    "Locality-wise government circle rates for Saharanpur, Uttar Pradesh – residential and commercial land rates per sq m, with source and how to verify. सहारनपुर सर्किल रेट लिस्ट।",
 
   verification: {
     google: "8znMG7RQBuQbkN2jM-G-NWUm009imkfy6cFdNNpFsig",
@@ -74,15 +74,16 @@ export const metadata = {
     "commercial shops",
   ],
   metadataBase: new URL("https://saharanpurprice.in"),
+  alternates: { canonical: "/" },
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
   },
   openGraph: {
-    title: "Property Rates in Saharanpur & Noida | Govt & Market Prices",
+    title: "Saharanpur Property Rates | Government Circle Rates by Locality",
     description:
-      "Official government and market property rates in Saharanpur and Noida Sectors.",
+      "Locality-wise government circle rates for Saharanpur, Uttar Pradesh.",
 
     url: "https://saharanpurprice.in/",
 
@@ -99,15 +100,15 @@ export const metadata = {
         url: "/main.png",
         width: 1200,
         height: 630,
-        alt: "Saharanpur and Noida Property Rates Directory",
+        alt: "Saharanpur property circle rates directory",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Property Rates in Saharanpur & Noida | Circle Rates 2025",
+    title: "Saharanpur Property Rates | Government Circle Rates by Locality",
     description:
-      "Verified directory for government and market property rates in Saharanpur and Noida.",
+      "Locality-wise government circle rates for Saharanpur, Uttar Pradesh.",
     images: ["/twitter-image.png"],
   },
 };
@@ -121,16 +122,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Saharanpur Price Directory",
-    url: "https://www.saharanpurprice.in",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: "https://www.saharanpurprice.in?search={search_term_string}",
-      },
-      "query-input": "required name=search_term_string",
-    },
+    name: "Saharanpur Price",
+    url: "https://saharanpurprice.in",
+    inLanguage: "en-IN",
   };
 
   return (
@@ -140,7 +134,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link
           rel="sitemap"
           type="application/xml"
-          href="https://www.saharanpurprice.in/sitemap.xml"
+          href="https://saharanpurprice.in/sitemap.xml"
         />
         <link rel="icon" href="/icon.png" />
 

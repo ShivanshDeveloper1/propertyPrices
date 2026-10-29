@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 
 
 export const metadata: Metadata = {
-  title: 'Saharanpur Property Circle Rate List 2025-26 | Most Trusted Dealer',
+  title: 'Saharanpur Circle Rate List PDF Download | सर्किल रेट लिस्ट',
   description: 'Download the official property circle rate list for Saharanpur and all Uttar Pradesh districts. Provided by Saharanpur’s most trusted property dealer.',
   keywords: ['Saharanpur property rates', 'circle rate Saharanpur', 'UP property rate list PDF', 'Saharanpur real estate'],
   robots: {

@@ -45,7 +45,7 @@ export default function LocalityCard({ locality }) {
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-              {locality.name}
+              {locality.name} {locality.name1 && <span className="text-base font-normal text-gray-500 font-sans">({locality.name1})</span>}
             </h3>
             <div className="flex items-center gap-1 text-gray-600 mt-1">
               <MapPin className="w-4 h-4" />

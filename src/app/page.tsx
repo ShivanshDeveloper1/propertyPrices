@@ -18,21 +18,22 @@ export interface Locality {
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ city?: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
   const params = await searchParams;
-  const cityName =
-    (params.city || "Saharanpur").charAt(0).toUpperCase() +
-    (params.city || "Saharanpur").slice(1).toLowerCase();
+  const page = Math.max(1, parseInt(params.page || "1") || 1);
+  const base = "https://saharanpurprice.in"; // canonical host (not env-dependent)
 
   return {
-    title: `Property Rates in ${cityName} | Govt Circle Rates ${new Date().getFullYear()}`,
-    description: `Latest government circle rates and market property prices in ${cityName}. Check land registry rates updated for ${new Date().getFullYear()}.`,
+    title:
+      page > 1
+        ? `Saharanpur Locality Circle Rates – Page ${page}`
+        : "Saharanpur Property Rates | Government Circle Rates by Locality (सर्किल रेट)",
+    description:
+      "Locality-wise government circle rates for Saharanpur, Uttar Pradesh – residential and commercial land rates per sq m. सहारनपुर सर्किल रेट लिस्ट, locality search in Hindi and English.",
     alternates: {
-      // ✅ Normalized canonical to prevent duplicate content
-      canonical: `${process.env.NEXT_PUBLIC_APP_URL}${
-        params.city ? `?city=${params.city.toLowerCase()}` : ""
-      }`,
+      // Self-referencing canonical; ?city= and other variants canonicalise here.
+      canonical: page > 1 ? `${base}/?page=${page}` : `${base}/`,
     },
   };
 }

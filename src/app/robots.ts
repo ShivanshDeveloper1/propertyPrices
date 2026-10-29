@@ -1,15 +1,14 @@
 import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://www.saharanpurprice.in";
-
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/auth/", "/admin/"],
+      // Admin / dealer-login / upload areas and internal APIs are not for search results.
+      disallow: ["/api/", "/admin/", "/allProperty", "/AgentLogin", "/AgentUpload", "/test-blog"],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

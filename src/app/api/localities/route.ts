@@ -31,7 +31,9 @@ export async function GET(request: Request) {
     if (search) {
       queryFilter.$or = [
         { name: { $regex: search, $options: "i" } },
+        { name1: { $regex: search, $options: "i" } },
         { tehsil: { $regex: search, $options: "i" } },
+        { slug: { $regex: search, $options: "i" } },
       ];
     }
 
@@ -62,6 +64,7 @@ export async function GET(request: Request) {
             _id: doc._id?.toString() || "",
             slug: doc.slug || "",
             name: doc.name || "Unknown Locality",
+            name1: doc.name1 || "",
             tehsil: doc.tehsil || "",
             district: doc.district || "",
             residential_plot_govt: doc.residential_plot_govt || 0,

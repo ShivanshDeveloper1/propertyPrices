@@ -8,9 +8,9 @@ export default function LocalityHeader({ locality }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-          {locality.name}
-        </h1>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          {locality.name} {locality.name1 && <span className="text-2xl md:text-3xl font-medium text-gray-500">({locality.name1})</span>}
+        </h2>
         
         <div className="flex items-center justify-center gap-1 text-gray-600 mb-4">
           <MapPin className="w-5 h-5" />

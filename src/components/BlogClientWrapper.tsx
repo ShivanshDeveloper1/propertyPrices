@@ -5,95 +5,54 @@ import Image from "next/image";
 import { FaFacebookF, FaTwitter, FaLink } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-// --- HELPER: Handles Links [Text](URL) AND Bold **Text** ---
+const gradientH2 =
+  "text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mt-8 mb-4";
+
+// Handles [Text](URL) and **bold**
 const formatText = (text: string) => {
   if (!text) return "";
+  const clean = text
+    .replace(/<strong>/g, "**").replace(/<\/strong>/g, "**")
+    .replace(/<b>/g, "**").replace(/<\/b>/g, "**");
 
-  // 1. Clean HTML bold tags (legacy support)
-  let cleanText = text
-    .replace(/<strong>/g, "**")
-    .replace(/<\/strong>/g, "**")
-    .replace(/<b>/g, "**")
-    .replace(/<\/b>/g, "**");
-
-  // 2. Split by Markdown Links: [Title](URL)
-  const parts = cleanText.split(/(\[.*?\]\(.*?\))/g);
-
-  return parts.map((part, index) => {
-    // A. Check if this part is a LINK
-    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
-    if (linkMatch) {
-      const linkText = linkMatch[1];
-      const linkUrl = linkMatch[2];
+  return clean.split(/(\[.*?\]\(.*?\))/g).map((part, index) => {
+    const m = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    if (m) {
       return (
         <a
           key={index}
-          href={linkUrl}
+          href={m[2]}
           target="_blank"
           rel="noopener noreferrer"
           className="text-cyan-400 hover:text-cyan-300 underline underline-offset-4 font-semibold transition-colors"
         >
-          {linkText}
+          {m[1]}
         </a>
       );
     }
-
-    // B. If not a link, process for BOLD (**text**)
-    const boldParts = part.split(/(\*\*.*?\*\*)/g);
     return (
       <span key={index}>
-        {boldParts.map((subPart, j) => {
-          if (subPart.startsWith("**") && subPart.endsWith("**")) {
-            return (
-              <strong key={j} className="text-cyan-400 font-bold">
-                {subPart.slice(2, -2)}
-              </strong>
-            );
-          }
-          return subPart;
-        })}
+        {part.split(/(\*\*.*?\*\*)/g).map((s, j) =>
+          s.startsWith("**") && s.endsWith("**") ? (
+            <strong key={j} className="text-cyan-400 font-bold">{s.slice(2, -2)}</strong>
+          ) : (
+            s
+          )
+        )}
       </span>
     );
   });
 };
 
-// --- GLOBAL DECLARATION FOR INSTAGRAM ---
-declare global {
-  interface Window {
-    instgrm?: {
-      Embeds: {
-        process: () => void;
-      };
-    };
-  }
-}
+const readTime = (b: any) => {
+  const words = [b.whyItMatters, b.realWorldExample, ...(b.consequences || [])]
+    .join(" ").split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+};
 
-export default function BlogClientWrapper({
-  metadata,
-  body,
-}: {
-  metadata: any;
-  body: any[];
-}) {
+export default function BlogClientWrapper({ blog }: { blog: any }) {
   const [currentUrl, setCurrentUrl] = useState("");
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-
-    // --- EMBED SCRIPT HANDLER (Instagram & Others) ---
-    const hasInstagramEmbed = document.querySelector(".instagram-media");
-
-    if (hasInstagramEmbed) {
-      if (typeof window !== "undefined" && !window.instgrm) {
-        const script = document.createElement("script");
-        script.src = "//www.instagram.com/embed.js";
-        script.async = true;
-        document.body.appendChild(script);
-      } else if (window.instgrm) {
-        window.instgrm.Embeds.process();
-      }
-    }
-  }, [body]);
+  useEffect(() => setCurrentUrl(window.location.href), []);
 
   const fadeUp = {
     hidden: { opacity: 0, y: 30 },
@@ -104,116 +63,63 @@ export default function BlogClientWrapper({
     }),
   };
 
-  const renderBlock = (block: any, index: any) => {
-    if (block.type === "heading") {
-      const level = block.level && block.level > 1 ? block.level : 2;
-      const Tag = `h${level}` as keyof JSX.IntrinsicElements;
-      return (
-        <Tag
-          key={index}
-          className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mt-8 mb-4"
-        >
-          {formatText(block.content || block.text)}
-        </Tag>
-      );
-    }
-
-    if (block.type === "paragraph") {
-      return (
-        <p key={index} className="text-lg text-gray-300 leading-relaxed mb-4">
-          {formatText(block.content || block.text)}
-        </p>
-      );
-    }
-
-    if(block.type == "pdf"){
-     return (
-    <div key={index} className="my-6">
-      <a
-        href={block.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block px-6 py-3 bg-cyan-500 text-black font-bold rounded-lg hover:bg-cyan-400 transition"
-      >
-        {block.title}
-      </a>
-    </div>
+  const comparison = (blog.comparison || []).filter(
+    (i: any) =>
+      i?.factor?.trim() &&
+      ((i.withInvestment || i.withWebsite || "").trim() ||
+        (i.withoutInvestment || i.withoutWebsite || "").trim())
   );
-    }
+  const consequences = (blog.consequences || []).filter(
+    (i: any) => typeof i === "string" && i.trim()
+  );
 
-    if (block.type === "list") {
-      return (
-        <ul
-          key={index}
-          className="list-disc list-inside space-y-3 pl-4 bg-gray-900/40 p-6 rounded-xl border border-gray-800 mb-6"
-        >
-          {block.items.map((item: string, i: number) => (
-            <li key={i} className="text-gray-300 leading-relaxed">
-              {formatText(item)}
-            </li>
-          ))}
-        </ul>
-      );
-    }
-
-    // --- HTML / EMBED BLOCK ---
-    if (block.type === "html" || block.type === "embed") {
-      return (
-        <div
-          key={index}
-          className="my-8 flex justify-center w-full"
-          dangerouslySetInnerHTML={{ __html: block.content }}
-        />
-      );
-    }
-
-    return null;
-  };
-
-  const imageUrl = metadata?.featuredImage?.url;
-  // console.log(blog.post.metadata.featuredImage.url);
-  const isValidUrl =
-    imageUrl &&
-    (imageUrl.startsWith("http") ||
-      imageUrl.startsWith("/") ||
-      imageUrl.startsWith("."));
+  const date = blog.createdAt
+    ? new Date(blog.createdAt).toLocaleDateString("en-IN", {
+        day: "numeric", month: "short", year: "numeric",
+      })
+    : "";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#0c1a2b] to-[#0a0a0f] text-white pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* HEADER */}
         <motion.section
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           className="flex flex-col items-center text-center gap-4"
         >
-          <motion.p
-            variants={fadeUp}
-            className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400 px-4 py-1 rounded-full text-sm font-medium shadow-md backdrop-blur"
-          >
-            {metadata.category}
-          </motion.p>
+          {blog.niche && (
+            <motion.p
+              variants={fadeUp}
+              className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 text-cyan-400 px-4 py-1 rounded-full text-sm font-medium shadow-md backdrop-blur"
+            >
+              {blog.niche}
+            </motion.p>
+          )}
 
           <motion.h1
             variants={fadeUp}
             className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 mt-2 max-w-4xl leading-tight"
           >
-            {metadata.title}
+            {blog.title}
           </motion.h1>
 
           <motion.p variants={fadeUp} className="text-gray-400 mt-2 text-sm">
-            {metadata.publishDate} &bull; {metadata.readTimeMinutes} min read
+            {date} &bull; {readTime(blog)} min read
           </motion.p>
 
-          <motion.div
-            variants={fadeUp}
-            className="w-full max-w-5xl my-10 md:my-12"
-          >
-            {isValidUrl ? (
+          <motion.div variants={fadeUp} className="w-full max-w-5xl my-10 md:my-12">
+            {blog.coverSvg ? (
+              <div
+                className="relative w-full aspect-video rounded-2xl overflow-hidden border border-gray-800 shadow-2xl [&>svg]:w-full [&>svg]:h-full"
+                dangerouslySetInnerHTML={{ __html: blog.coverSvg }}
+              />
+            ) : blog.imageUrl ? (
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-gray-800 shadow-2xl">
                 <Image
-                  src={imageUrl}
-                  alt={metadata.featuredImage.altText || metadata.title}
+                  src={blog.imageUrl}
+                  alt={blog.title}
                   fill
                   className="object-cover hover:scale-105 transition-transform duration-700"
                   priority
@@ -228,33 +134,85 @@ export default function BlogClientWrapper({
         </motion.section>
 
         <section className="w-full flex flex-col lg:flex-row gap-12 lg:gap-16">
+          {/* ARTICLE */}
           <motion.article
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             className="w-full lg:w-2/3 flex flex-col gap-2"
           >
-   
-            {body.map((block, index) => {
-              if (block.type === "section") {
-                return (
-                  <div key={index} className="mb-8">
-                    {block.heading && (
-                      <h2 className="text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mt-8 mb-4">
-                        {block.heading}
-                      </h2>
-                    )}
-                    {block.content &&
-                      block.content.map((innerBlock: any, i: number) =>
-                        renderBlock(innerBlock, `${index}-${i}`)
-                      )}
-                  </div>
-                );
-              }
-              return renderBlock(block, index);
-            })}
+            {blog.whyItMatters?.trim() && (
+              <div className="mb-8">
+                <h2 className={gradientH2}>Why This Matters for Saharanpur Property Buyers</h2>
+                <p className="text-lg text-gray-300 leading-relaxed mb-4">
+                  {formatText(blog.whyItMatters)}
+                </p>
+              </div>
+            )}
+
+            {comparison.length > 0 && (
+              <div className="mb-8">
+                <h2 className={gradientH2}>Property Investment Analysis</h2>
+                <div className="overflow-x-auto rounded-xl border border-gray-800 bg-gray-900/40">
+                  <table className="w-full min-w-[560px] text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-900/80">
+                        <th className="px-5 py-3 font-semibold text-cyan-400 border-b border-gray-800">Factor</th>
+                        <th className="px-5 py-3 font-semibold text-cyan-400 border-b border-gray-800">With Property Investment</th>
+                        <th className="px-5 py-3 font-semibold text-cyan-400 border-b border-gray-800">Without Property Investment</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comparison.map((item: any, i: number) => {
+                        const w = item.withInvestment || item.withWebsite;
+                        const wo = item.withoutInvestment || item.withoutWebsite;
+                        return (
+                          <tr key={i} className="border-b border-gray-800 last:border-b-0 hover:bg-gray-800/40">
+                            <td className="px-5 py-4 font-medium text-white">{item.factor}</td>
+                            <td className="px-5 py-4 text-gray-300">{w?.trim() ? formatText(w) : "N/A"}</td>
+                            <td className="px-5 py-4 text-gray-300">{wo?.trim() ? formatText(wo) : "N/A"}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {consequences.length > 0 && (
+              <div className="mb-8">
+                <h2 className={gradientH2}>Key Considerations & Potential Risks</h2>
+                <ul className="list-disc list-inside space-y-3 pl-4 bg-gray-900/40 p-6 rounded-xl border border-gray-800 mb-6">
+                  {consequences.map((item: string, i: number) => (
+                    <li key={i} className="text-gray-300 leading-relaxed">{formatText(item)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {blog.realWorldExample?.trim() && (
+              <div className="mb-8 p-6 rounded-xl bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30">
+                <h2 className="text-xl font-bold text-white mb-3">Real-World Saharanpur Scenario</h2>
+                <p className="text-gray-300 leading-relaxed">{formatText(blog.realWorldExample)}</p>
+              </div>
+            )}
+
+            {blog.callToAction?.trim() && (
+              <div className="mt-6 p-8 rounded-xl text-center bg-gray-900/60 border border-gray-800">
+                <h2 className="text-2xl font-bold mb-3">Explore Property Listings in Saharanpur</h2>
+                <p className="text-gray-400 max-w-2xl mx-auto mb-6">{formatText(blog.callToAction)}</p>
+                <a
+                  href="/"
+                  className="inline-block px-6 py-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-black font-bold transition"
+                >
+                  Browse Listings Today
+                </a>
+              </div>
+            )}
           </motion.article>
 
+          {/* SIDEBAR */}
           <motion.aside
             initial="hidden"
             animate="visible"
@@ -264,14 +222,10 @@ export default function BlogClientWrapper({
           >
             <div className="sticky top-24 space-y-8">
               <div className="p-6 rounded-2xl bg-gradient-to-br from-[#111827] to-[#0d1321] border border-gray-800 shadow-xl backdrop-blur-lg">
-                <h3 className="text-xl font-semibold text-white mb-4">
-                  Share this article
-                </h3>
+                <h3 className="text-xl font-semibold text-white mb-4">Share this article</h3>
                 <div className="flex gap-4">
                   <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      currentUrl
-                    )}`}
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-3 rounded-full bg-[#1877F2]/20 text-[#1877F2] hover:bg-[#1877F2]/40 transition"
@@ -279,9 +233,7 @@ export default function BlogClientWrapper({
                     <FaFacebookF size={20} />
                   </a>
                   <a
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-                      currentUrl
-                    )}&text=${encodeURIComponent(metadata.title)}`}
+                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(blog.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-3 rounded-full bg-[#1DA1F2]/20 text-[#1DA1F2] hover:bg-[#1DA1F2]/40 transition"
@@ -289,9 +241,7 @@ export default function BlogClientWrapper({
                     <FaTwitter size={20} />
                   </a>
                   <button
-                    onClick={() => {
-                      if (currentUrl) navigator.clipboard.writeText(currentUrl);
-                    }}
+                    onClick={() => currentUrl && navigator.clipboard.writeText(currentUrl)}
                     className="p-3 rounded-full bg-gray-700/50 text-gray-300 hover:bg-gray-600 transition"
                   >
                     <FaLink size={20} />
@@ -300,12 +250,9 @@ export default function BlogClientWrapper({
               </div>
 
               <div className="p-6 rounded-2xl bg-gradient-to-br from-cyan-900/20 to-purple-900/20 border border-cyan-500/30 shadow-xl">
-                <h3 className="text-xl font-bold text-white mb-2">
-                  Buying Property?
-                </h3>
+                <h3 className="text-xl font-bold text-white mb-2">Buying Property?</h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  Don't trust blindly. Check the official price trends on our
-                  platform before you negotiate.
+                  Don&apos;t trust blindly. Check the official price trends on our platform before you negotiate.
                 </p>
                 <a
                   href="/"

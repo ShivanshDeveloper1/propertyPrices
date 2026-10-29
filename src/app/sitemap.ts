@@ -1,65 +1,59 @@
 import { connectDB } from "@/lib/mongodb";
-import { LocalityModel } from "@/models/Locality"; // ✅ Match the export name
-import { Blog } from "@/models/Blog"; // ✅ Blog is a class, so .list() works
-import { getAllProperties} from "@/actions/(admin)/getPropertie/properties";
+import Blog from "@/models/Blog";
+import { getAllProperties } from "@/actions/(admin)/getPropertie/properties";
+import { getAllLocalitySummaries } from "@/lib/db/localities";
+import { SITE_URL, isSaharanpur } from "@/lib/seo";
 
 export const revalidate = 43200; // Re-generates the sitemap every 12 hours
 
-export default async function sitemap() {
-  const baseUrl = "https://www.saharanpurprice.in";
+const getSafeDate = (dateInput?: string | Date | null) => {
+  const date = new Date(dateInput as any);
+  return isNaN(date.getTime()) ? undefined : date;
+};
 
-  // 1. Connect to DB first
+export default async function sitemap() {
+  const baseUrl = SITE_URL;
   await connectDB();
 
-  // 2. Fetch Data
-  // LocalityModel uses .find() because it's a raw Mongoose model
-  // Blog uses .list() because you built a class for it
-  const [localities, blogs,properties] = await Promise.all([
-    LocalityModel.find({}).lean(),
-    Blog.list(),
+  const [localities, blogs, properties] = await Promise.all([
+    getAllLocalitySummaries(),
+    Blog.find({}).select("slug updatedAt createdAt").lean().catch(() => [] as any[]),
     getAllProperties(),
   ]);
 
-  const getSafeDate = (dateInput) => {
-    const date = new Date(dateInput);
-    return isNaN(date.getTime()) ? new Date() : date;
-  };
+  // Only indexable (Saharanpur) localities; matches the page-level robots rule.
+  const localityUrls = localities
+    .filter((loc) => loc.slug && isSaharanpur(loc.district))
+    .map((loc) => ({
+      url: `${baseUrl}/locality/${loc.slug}`,
+      lastModified: getSafeDate(loc.last_updated),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
 
-    // 4. Map Properties (Crucial for Real Estate SEO)
-  const propertyUrls = properties.map((prop) => ({
-    url: `${baseUrl}/properties/${prop.slug}`,
-    lastModified: getSafeDate(prop.updatedAt),
-    changeFrequency: "daily",
-    priority: 0.9, // Higher priority for property listings
-  }));
-
-  // 3. Localities
-  const localityUrls = localities.map((loc) => ({
-    url: `${baseUrl}/locality/${loc.slug}`,
-    lastModified: getSafeDate(loc.last_updated),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
-
-  // 4. Blogs
   const blogUrls = blogs.map((blog) => ({
     url: `${baseUrl}/blogs/${blog.slug}`,
     lastModified: getSafeDate(blog.updatedAt || blog.createdAt),
-    changeFrequency: "monthly",
+    changeFrequency: "monthly" as const,
     priority: 0.7,
   }));
 
+  const propertyUrls = properties.map((prop) => ({
+    url: `${baseUrl}/properties/${prop.slug}`,
+    lastModified: getSafeDate(prop.updatedAt),
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
 
-
-
-
-
-
-const staticUrls = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
-    { url: `${baseUrl}/oldbooks`, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 }, // 👈 Super high priority for your book platform
-    { url: `${baseUrl}/blogs`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+  // Only routes that actually exist in the app.
+  const staticUrls = [
+    { url: baseUrl, changeFrequency: "weekly" as const, priority: 1.0 },
+    { url: `${baseUrl}/download-circle-rate`, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/guide/saharanpur-circle-rate`, changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/blogs`, changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${baseUrl}/properties`, changeFrequency: "weekly" as const, priority: 0.6 },
+    { url: `${baseUrl}/about`, changeFrequency: "yearly" as const, priority: 0.3 },
   ];
 
-return [...staticUrls, ...localityUrls, ...blogUrls, ...propertyUrls];
+  return [...staticUrls, ...localityUrls, ...blogUrls, ...propertyUrls];
 }

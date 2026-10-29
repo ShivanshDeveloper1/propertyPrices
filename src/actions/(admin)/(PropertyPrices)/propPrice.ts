@@ -15,9 +15,12 @@ export async function searchLocalities(searchTerm){
 
         // OPTIMIZATION 2: regex search, select only needed fields, lean, and limit
     const localities = await LocalityModel.find({
-      name: { $regex: searchTerm, $options: "i" }, // "i" makes it case-insensitive
+      $or: [
+        { name: { $regex: searchTerm, $options: "i" } },
+        { name1: { $regex: searchTerm, $options: "i" } },
+      ],
     })
-      .select("_id name district tehsil residential_plot_govt residential_plot_market")
+      .select("_id name name1 district tehsil residential_plot_govt residential_plot_market")
       .lean()
       .limit(10); // Prevent loading hundreds of records at once
 
