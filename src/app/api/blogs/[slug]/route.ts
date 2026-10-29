@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Blog } from "@/models/Blog";
+import Blog from "@/models/Blog";
 import { connectDB } from "@/lib/mongodb"; // ✅ ADD
 
 export async function GET(

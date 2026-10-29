@@ -28,3 +28,17 @@ export async function getPublishedBlogCards({ limit = 8, skip = 0 } = {}) {
     };
   });
 }
+
+
+
+
+export async function getPublishedBlogBySlug(slug: string) {
+  await connectDB();
+
+  const blog = await Blog.findOne({
+    slug,
+    isPublished: true,
+  }).lean();
+
+  return blog;
+}

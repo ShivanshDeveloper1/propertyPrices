@@ -48,6 +48,9 @@ export async function GET(request: Request) {
         .sort({ last_updated: -1 })
         .skip(skip)
         .limit(limit)
+        .select(
+          "name name1 slug tehsil district residential_plot_govt residential_plot_market last_updated",
+        )
         .lean(),
       LocalityModel.countDocuments(queryFilter),
     ]);

@@ -3,6 +3,8 @@ import SearchableLocalities from "@/components/home/SearchableLocalities";
 import Link from "next/link";
 import React from "react";
 import { questions } from "@/data/Accordian";
+import { getLocalitiesPage, getAllLocalitySummaries } from "@/lib/db/localities";
+import { SITE_URL } from "@/lib/seo";
 
 export interface Locality {
   _id: string;
@@ -38,23 +40,7 @@ export async function generateMetadata({
   };
 }
 
-async function getLocalities(page: number, city: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://127.0.0.1:3000";
-  const apiUrl = `${baseUrl}/api/localities?page=${page}&limit=20&city=${city}`;
 
-  try {
-    const res = await fetch(apiUrl, {
-      cache: "no-store",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (!res.ok) throw new Error(`API Error ${res.status}`);
-    return await res.json();
-  } catch (error) {
-    // console.error("❌ Fetch Error:", error);
-    return { data: [], pagination: { totalPages: 1, page: 1 } };
-  }
-}
 
 export default async function Home({
   searchParams,
@@ -62,12 +48,27 @@ export default async function Home({
   searchParams: Promise<{ page?: string; city?: string }>;
 }) {
   const params = await searchParams;
-  const currentPage = parseInt(params.page || "1");
+  const currentPage = Math.max(1, parseInt(params.page || "1") || 1);
   const currentCity = params.city || "Saharanpur";
 
-  const response = await getLocalities(currentPage, currentCity);
+  const [response, allLocalities] = await Promise.all([
+    getLocalitiesPage({
+      page: currentPage,
+      limit: 20,
+      city: currentCity,
+    }),
+    getAllLocalitySummaries().catch(() => []),
+  ]);
   const localities = response.data || [];
   const pagination = response.pagination || { page: 1, totalPages: 1 };
+  const browseLocalities = (
+    allLocalities && allLocalities.length > 0
+      ? (currentCity === "Saharanpur"
+          ? allLocalities.filter((loc) => /saharanpur/i.test(loc.district || ""))
+          : allLocalities
+        ).sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      : localities
+  );
 
   // ✅ IMPROVED SCHEMA FOR GOOGLE
   const jsonLd = {
@@ -75,13 +76,13 @@ export default async function Home({
     "@type": "CollectionPage",
     name: `Property Rates in ${currentCity}`,
     description: `Official circle rates and market values for land and plots in ${currentCity}.`,
-    url: `${process.env.NEXT_PUBLIC_APP_URL}/?city=${currentCity.toLowerCase()}`,
+    url: `${SITE_URL}/?city=${currentCity.toLowerCase()}`,
     mainEntity: {
       "@type": "ItemList",
       itemListElement: localities.map((loc: Locality, index: number) => ({
         "@type": "ListItem",
         position: index + 1,
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/locality/${loc.slug}`,
+        url: `${SITE_URL}/locality/${loc.slug}`,
         name: loc.name,
       })),
     },
@@ -179,9 +180,9 @@ export default async function Home({
           Browse All Localities in {currentCity}
         </h3>
         <div className="flex flex-wrap justify-center gap-2 max-h-[300px] overflow-y-auto px-2">
-          {localities.map((loc: Locality) => (
+          {browseLocalities.map((loc: any) => (
             <Link
-              key={loc._id}
+              key={loc.slug || loc._id}
               href={`/locality/${loc.slug}`}
               className="text-xs text-slate-600 bg-slate-100 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-full transition-colors font-medium border border-transparent"
             >
